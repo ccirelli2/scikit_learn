@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+**** Lets include this tutorial
+https://www.analyticsvidhya.com/blog/2016/01/guide-data-exploration/
+
 Purpose:  Practice with exploratory data analysis techniques
 
 Boston dataset
