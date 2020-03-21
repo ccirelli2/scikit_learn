@@ -110,6 +110,14 @@ print(conf_matrix)
 
 
 
+# Vizualize Tree -------------------------------------------------------
+def viz_tree():
+    atree = rdf_fit.estimators_[5]
+    export_graphviz(atree, out_file= out_dir + '/' + 'rf_wine_plot_tree.dot', 
+            feature_names = feature_names, rounded=True, precision=1)
+
+viz_tree()
+
 
 
 
