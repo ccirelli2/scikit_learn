@@ -1,0 +1,62 @@
+Ref:  https://www.khanacademy.org/math/statistics-probability/inference-categorical-data-chi-square-tests/chi-square-goodness-of-fit-tests/v/chi-square-distribution-introduction
+
+Python Ex:  https://es.coursera.org/lecture/data-analysis-tools/python-lesson-2-chi-square-test-of-independence-in-practice-MWLEx
+
+
+Chi-Squared Test for Feature Selection
+https://towardsdatascience.com/chi-squared-test-for-feature-selection-with-implementation-in-python-65b4ae7696db
+
+X2 Distribtion:	Sample from standard normal distribution and square 
+		this value.  The distribution of this new value
+		has a chi-squared distribution.
+
+Degrees of Freedom:	
+		Depends on the number of variables that we are sampling.
+		So 2 DF would be the sampling of two variables from a 
+		standard normall distribution. 
+		You square each and add them together to get the new
+		X2 distribution with degrees of freedom of 2. 
+		 
+
+X2 Distribution:
+		Very likely to get a value close to 0 since the mean of 
+		a normal dist is 0.  It is very unlikely to get a large
+		value. 
+		The curve moderates as the DF increases. 
+		The more degrees of freedom the more symmetric the dist
+		becomes. 
+		Also, note that you can't have a value below zero since
+		we are squaring the values. 
+
+X2 Dist Table	Shows the probabilities associated with getting a value
+		larger than a given value w/ n number of DFs. 
+
+
+
+Test:		We would need to have a binary target variable, 
+		loss or not, and our explanatory variable can have
+		any number of categories. 
+
+		Looking for a large chi-suqared value and a low 
+		p-value.  This will tell us if the explanatory and
+		response are related and the extent of that 
+		relationship.
+		Rows should be response, columns should be 
+		explanatory. 
+		 
+
+When to use the X2 Test?
+		When the data type of our feature to be tested and 
+		the target variable are both categorical, i.e. we have
+		a classification problem. 
+
+Decide whether to reject or keep our null hypothesis
+		In simple words if our p value is less than the 
+		significance value we reject the Null Hypothesis 
+		and if our p value is greater than the significance 
+		value we do not reject it.
+
+
+
+
+

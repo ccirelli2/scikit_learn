@@ -3,6 +3,7 @@
     Url: https://machinelearningmastery.com/chi-squared-test-for-machine-learning/
 
     Video; https://www.youtube.com/watch?time_continue=5&v=IrZOKSGShC8
+    https://en.wikipedia.org/wiki/Chi-squared_test
 '''
 
 # Load Libraries ---------------------------------------------
