@@ -16,7 +16,7 @@ import math
 
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import r2_score
 
 # Load Data -------------------------------------------------------------------
@@ -100,10 +100,7 @@ def compare_metrics(y_test, ridge_pred, ols_pred):
     print(df)
     
 #compare_metrics(y_test, ridge_pred, ols_pred)
-    
-    
-    
-    
+       
     
 # Lasso -----------------------------------------------------------------------
 from sklearn.linear_model import Lasso
