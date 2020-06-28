@@ -1,130 +1,124 @@
 # -*- coding: utf-8 -*-
 """
-Desc   Tutorial on Ridge & Lasso Regression
-Source https://www.analyticsvidhya.com/blog/2017/06/a-comprehensive-guide-for-linear-ridge-and-lasso-regression/
-       https://stackoverflow.com/questions/26319259/how-to-get-a-regression-summary-in-python-scikit-like-r-does
+Created on Sat Jun 27 15:26:31 2020
+
+@author: chris.cirelli
 """
 
 
-# Import Libraries ------------------------------------------------------------
-import pandas as pd
-from pandas.plotting import scatter_matrix
-pd.set_option('display.max.columns', None)
-pd.set_option('display.max.rows', 500)
+# Import Libraries -----------------------------------------------------------
 import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import matplotlib.pyplot as plt
+import math
+
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-import sklearn.metrics as metrics
-import statsmodels.api as sm
-import matplotlib.pyplot as plt
-
-
-# Define Directories ----------------------------------------------------------
-dir_data = r'C:\Users\chris.cirelli\Desktop\repositories\scikit_learn\data'
+from sklearn.metrics import r2_score
 
 # Load Data -------------------------------------------------------------------
-df_train = pd.read_csv(dir_data + '/' + 'groceries_train.csv')
-df_test = pd.read_csv(dir_data + '/' + 'groceries_test.csv')
+dataset = sm.datasets.get_rdataset('Guerry', 'HistData')
+data = dataset.data
 
+# Inspect Data ----------------------------------------------------------------
+def inspect_data(dataset):
+    print(dataset.__doc__)
+    print(dataset.data.head())
 
-# Inspect Data set ------------------------------------------------------------
-col_names = df_train.columns
-sample = df_train.sample(10)
-df_desc = df_train.describe()
-continuous = ['Item_Weight', 'Item_Visibility', 'Item_MRP', 'Item_Outlet_Sales']
-df_cont = df_train[continuous]
+# Select Only Numberical Data Types -------------------------------------------
+'Target = All_Crime'
+data = data.select_dtypes(include=np.number)
+data.drop('dept', axis=1, inplace=True)
+data['All_Crime'] = data.loc[:, 'Crime_pers'] + data.loc[:, 'Crime_prop']
 
+# Split X & Y
+y = data.loc[:, 'All_Crime']
+x = data.drop(['All_Crime', 'Crime_pers', 'Crime_prop'], axis=1)
 
-# Generate Correlation Matrix -------------------------------------------------
-'With OLS we should always check if independent variables are correlated'
-df_corr = df_train.corr(method='pearson')
+# Split Train Test ------------------------------------------------------------
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.3, 
+                                                    random_state = 123, shuffle=True)
 
-def scatter_plot():
-    plt.scatter(X_train['Item_MRP'], y_train)
-    plt.show()
-
-# Creating Dataset ------------------------------------------------------------
-'''
-Item_Identifier    Looks like a product key.  We can probably drop this
-Item_Weight        Has Nan values
-Item_Fat_Content   Is a categorical feature
-Item_Type          Categorical Feature
-Item_Visibility    Continuous / Nan Values
-Item_MRP           Continuous
-Outlet_Identifier  Categorical feature
-Year               Ordinal
-Outlet Size        Categorical
-Outlet_Location_Type  Categorical
-Outlet Type        Categorical
-Item Outlet Sales  Continuous / Target Variable
-'''
-
-# Replace Nan Values W/ Mean
-df_train['Item_Visibility'] = df_train['Item_Visibility'].replace(0, np.mean(df_train['Item_Visibility']))
-df_train['Outlet_Establishment_Year'] = 2013 - df_train['Outlet_Establishment_Year']
-df_train['Outlet_Size'].fillna('Small', inplace=True)  #small is one of the feature elements. 
-
-# Create Dummy Variables
-mylist = list(df_train.select_dtypes(include=['object']).columns)  #get colnames for categorical variables
-dummies = pd.get_dummies(df_train[mylist], prefix=mylist)
-
-# Drop Original Features
-df_train.drop(mylist, axis=1, inplace=True)
-
-# Create X Variable 
-X = pd.concat([df_train, dummies], axis=1)
-
-
-# Fit Model -------------------------------------------------------------------
-
-# Instantiate Model 
+# Fit OLS ---------------------------------------------------------------------
 lreg = LinearRegression()
-
-# Isolate Independent Features
-X.dropna(inplace=True)
-y = X.loc[:, 'Item_Outlet_Sales']
-X = X.drop('Item_Outlet_Sales', axis=1)
-
-# Train / Test Split
-x_train, x_cv, y_train, y_cv = train_test_split(X, y, test_size =0.3)
-
-# Fit Model
 lreg.fit(x_train, y_train)
+ols_pred = lreg.predict(x_test)
 
-# Predict
-pred_cv = lreg.predict(x_cv)
-
-# Calcualte MSE
-mse = np.mean((pred_cv - y_cv)**2)
-
-# R2
-r2 = lreg.score(x_cv, y_cv)
-print(r2)
-
-
-
-
-
-
-
-
-
-
-
+# Get Mean Squared Error ------------------------------------------------------
+def get_metrics(y_test, pred, pprint):
+    mse = mean_squared_error(y_test, pred)
+    rmse = math.sqrt(mse)
+    r2 = r2_score(y_test, pred)
+    coeffs = pd.Series(lreg.coef_)
+    df_coeffs = pd.DataFrame({})
+    df_coeffs['names'] = x_train.columns
+    df_coeffs['coeffs'] = coeffs
+    
+    if pprint==True:
+        print('MSE => {}'.format(mse))
+        print('RMSE => {}'.format(rmse))
+        print('R2 => {}'.format(r2))
+        print('Coefficients => {}'.format(df_coeffs))
+    
+    return mse, rmse, r2    
 
 
+# Fit Ridge Regression --------------------------------------------------------
+from sklearn.linear_model import Ridge
+ridgeReg = Ridge(alpha=0.5, normalize=True)
+ridgeReg.fit(x_train, y_train)
+ridge_pred = ridgeReg.predict(x_test)
+#get_metrics(y_test, pred)
 
+def compare_coeffs(x_train, ridgeReg, lreg, pprint, pplot):
+    col_names = x_train.columns
+    df = pd.DataFrame({})
+    df['features'] = col_names
+    df['ols_coeffs'] = pd.Series(lreg.coef_)
+    df['ridge_coeffs'] = pd.Series(ridgeReg.coef_)
+    if pprint == True:
+        print(df)
+    if pplot == True:
+        df.plot(kind='bar')
+    return df
+#df_coeff_compare = compare_coeffs(x_train, ridgeReg, lreg, pprint=False, pplot=True)
 
+def compare_metrics(y_test, ridge_pred, ols_pred):
+    df = pd.DataFrame({})
+    
+    ols_mse, ols_rmse, ols_r2 = get_metrics(y_test, ols_pred, False)
+    ridge_mse, ridge_rmse, ridge_r2 = get_metrics(y_test, ridge_pred, False)
+    
+    df['mse'] = [ols_mse, ridge_mse]
+    df['rmse'] = [ols_rmse, ridge_rmse]
+    df['r2'] = [ols_r2, ridge_r2]
+    df['method'] = ['OLS', 'Ridge']
+    
+    print(df)
+    
+#compare_metrics(y_test, ridge_pred, ols_pred)
+    
+    
+    
+    
+    
+# Lasso -----------------------------------------------------------------------
+from sklearn.linear_model import Lasso
+lassoReg = Lasso()
+lassoReg.fit(x_train, y_train) 
+lasso_pred = lassoReg.predict(x_test)
 
-                                              
-                                              
+get_metrics(y_test, lasso_pred, pprint=True)   
+    
+df = compare_metrics(y_test, lasso_pred, ridge_pred)
 
-
-
-
-
-
-
+    
+compare_coeffs(x_train, lassoReg, ridgeReg, pprint=False, pplot=True)    
+    
+ 
     
     
     
@@ -139,9 +133,31 @@ print(r2)
     
     
     
-    
-    
-    
+
+
+
+
+
+
+
 
     
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
