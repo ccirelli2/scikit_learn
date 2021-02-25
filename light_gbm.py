@@ -16,6 +16,11 @@ References:
     Parameter Tuning:
         https://neptune.ai/blog/lightgbm-parameters-guide
         https://towardsdatascience.com/the-10-best-new-features-in-scikit-learn-0-24-f45e49b6741b
+        https://medium.com/@sergei740/hyperparameter-tuning-lightgbm-using-random-grid-search-dc11c2f8c805
+        https://towardsdatascience.com/the-10-best-new-features-in-scikit-learn-0-24-f45e49b6741b
+    Offset:
+        https://towardsdatascience.com/offsetting-the-model-logic-to-implementation-7e333bc25798
+        https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.Dataset.html
 """
 
 ###############################################################################
@@ -41,8 +46,14 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_validate
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import RepeatedStratifiedKFold
-from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
+
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.experimental import enable_halving_search_cv  
+from sklearn.model_selection import HalvingGridSearchCV
+from sklearn.model_selection import HalvingRandomSearchCV
+
 
 ###############################################################################
 # Library Settings
@@ -128,20 +139,52 @@ def lgb_binary_cv(X_train, y_train, X_test, y_test, params, num_rounds):
 # Train Light GBM Model For Classification - Grid Search Approaches
 ###############################################################################
 
-params = {}
-params['learning_rate']=[0.1, 0.01, 0.001, 0.001]
-params['boosting_type'] = 'gbdt'                # boosting type
-params['objective'] = 'binary'                  # classification
-params['metric'] = 'binary_logloss'
-params['sub_feature'] = 0.5
-params['num_leaves'] = 10
-params['min_data'] = 20
-params['max_depth'] = 10
+gridParams = {}
+gridParams['learning_rate']=    [0.1, 0.01, 0.001, 0.001]
+gridParams['boosting_type'] =   ['gbdt', 'dart']
+gridParams['objective'] =       ['binary']                  
+gridParams['metric'] =          ['binary_logloss']
+gridParams['n_estimators'] =    [100, 500, 1000]
+"""
+gridParams['sub_feature'] =     [0.5]
+gridParams['num_leaves'] =      [5, 10, 15, 20]
+gridParams['max_depth'] =       [5, 10, 20, 30]
+
+gridParams['colsample_bytree'] = [0.65]
+gridParams['subsample'] =       [0.7, 0.8]
+gridParams['min_data'] =        [20]
+"""
+
+def lgb_gridsearch(X_train, y_train, X_test, y_test, gridParams):
+    # Instantiate Model
+    lgb=LGBMClassifier(verbosity=-1)
+    # Pass Model & Params to GridSearch Object
+    grid=HalvingRandomSearchCV(lgb, gridParams)
+    # Fit GridSearch Object on Training data
+    grid.fit(X_train, y_train)
+    # Print the best parameters found
+    print(grid.best_params_)
+    print(grid.best_score_)
+    # Return grid boject
+    return grid
+
+grid=lgb_gridsearch(X_train, y_train, X_test, y_test, gridParams)
 
 
 
-def lgb_gridsearch(X_train, y_train, X_test, y_test):
-        pass
+# Utilize Grid to Update Parameter Object
+"""
+params['learning_rate'] = grid.best_params_['learning_rate']
+params['boosting_type'] = grid.best_params_['boosting_type']
+params['objective'] = grid.best_params_['objective']                 
+params['metric'] = grid.best_params_['metric']
+params['sub_feature'] = grid.best_params_['sub_feature']
+params['num_leaves'] = grid.best_params_['num_leaves']
+params['min_data'] = grid.best_params_['min_data']
+params['max_depth'] = grid.best_params_['max_depth']
+params['n_estimators'] = grid.best_params_['n_estimators']
+params['subsample'] = grid.best_params_['subsample']
+"""
 
 
 
