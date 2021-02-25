@@ -4,7 +4,7 @@
 
 Training_video:     https://www.youtube.com/
                     watch?v=WRaKnFB3SYQ&list=PLonlF40eS6nynU5ayxghbz2QpDsUAyCVF&index=8
-
+                    https://towardsdatascience.com/building-a-logistic-regression-in-python-step-by-step-becd4d56c9c8
 Dataset:            cancer (built-in)
 
 Model:              Classification model.  Binary target 0/1. :

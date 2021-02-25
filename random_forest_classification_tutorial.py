@@ -5,9 +5,22 @@ DS Objective: Predict the win maker.
 """
 
 # Import Libraries 
+import os
+import sys
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
+import warnings
+import logging
+import inspect
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import export_graphviz
+from sklearn.metrics import mean_squared_error
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import export_graphviz
@@ -15,9 +28,8 @@ from sklearn.metrics import plot_confusion_matrix
 from sklearn import metrics
 from sklearn import datasets
 from sklearn.metrics import accuracy_score
-import pydot
-import math as m
-from sklearn import preprocessing
+from sklearn.decomposition import PCA
+import xgboost as xgb
 
 pd.set_option('display.max_columns', None)
 
@@ -100,14 +112,11 @@ rdf_fit = rdf.fit(X_train, Y_train)
 rdf_pred = rdf_fit.predict(x_test)
 print(accuracy_score(y_test, rdf_pred))
 
-
-
 # Print Classification Report
 class_report = metrics.classification_report(y_test, rdf_pred, labels = [0,1,2])
 conf_matrix = metrics.confusion_matrix(y_test, rdf_pred, labels=[0,1,2])
 print(class_report)
 print(conf_matrix)
-
 
 
 # Vizualize Tree -------------------------------------------------------
