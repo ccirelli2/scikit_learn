@@ -50,9 +50,9 @@ from sklearn.model_selection import train_test_split
 
 
 from sklearn.model_selection import GridSearchCV
-from sklearn.experimental import enable_halving_search_cv  
-from sklearn.model_selection import HalvingGridSearchCV
-from sklearn.model_selection import HalvingRandomSearchCV
+#from sklearn.experimental import enable_halving_search_cv  
+#from sklearn.model_selection import HalvingGridSearchCV
+#from sklearn.model_selection import HalvingRandomSearchCV
 
 
 ###############################################################################
@@ -124,7 +124,7 @@ def lgb_binary(X_train, y_train, X_test, y_test, params, num_rounds):
     plt.show()
     ax = lgb.plot_tree(clf) 
     plt.show()
-#lgb_binary(X_train, y_train, X_test, y_test, params, num_rounds=500)
+lgb_binary(X_train, y_train, X_test, y_test, params, num_rounds=500)
 
 
     
@@ -168,7 +168,7 @@ def lgb_gridsearch(X_train, y_train, X_test, y_test, gridParams):
     # Return grid boject
     return grid
 
-grid=lgb_gridsearch(X_train, y_train, X_test, y_test, gridParams)
+#grid=lgb_gridsearch(X_train, y_train, X_test, y_test, gridParams)
 
 
 
