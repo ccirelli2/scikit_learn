@@ -1,6 +1,6 @@
 cycler==0.10.0
 graphviz==0.13.2
-joblib==0.14.1
+joblib==1.2.0
 kiwisolver==1.1.0
 matplotlib==3.2.0
 numpy==1.18.2
@@ -13,7 +13,7 @@ scipy==1.4.1
 six==1.14.0
 cycler==0.10.0
 graphviz==0.13.2
-joblib==0.14.1
+joblib==1.2.0
 kiwisolver==1.1.0
 matplotlib==3.2.0
 numpy==1.18.2
